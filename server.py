@@ -143,4 +143,4 @@ api.add_resource(UserListAPI, '/api/v1/users', endpoint='users')
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
