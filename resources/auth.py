@@ -4,19 +4,18 @@
 from flask import abort, jsonify, make_response
 from flask_restful import Resource, reqparse
 from flask_httpauth import HTTPTokenAuth
-from flask_bcrypt import Bcrypt
-from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
+from itsdangerous import (TimedJSONWebSignatureSerializer as JWT, BadSignature, SignatureExpired)
 from models.user import User
-from app.config import schema, secret
-auth = HTTPTokenAuth(scheme=schema)
-bcrypt = Bcrypt()
+from app.config import config
+auth = HTTPTokenAuth(scheme=config['authSchema'])
+bcrypt = config['bcrypt']
 
 
 @auth.verify_token
 def verify_token(token):
-    s = Serializer(secret)
+    jwt = JWT(config['secret'])
     try:
-        data = s.loads(token)
+        data = jwt.loads(token)
     except SignatureExpired:
         abort(403)
     except BadSignature:
@@ -38,24 +37,19 @@ class AuthAPI(Resource):
 
 
     def verify_password(self, hash, password):
-        try:
-            bcrypt.check_password_hash(hash, password)
-        except:
-            return False
-        return True
+        return bcrypt.check_password_hash(hash, password)
 
 
     def generate_auth_token(self, user, expiration=3600):
-        s = Serializer(secret, expires_in=expiration)
-        return s.dumps({'id': str(user[0].id)})
+        jwt = JWT(config['secret'], expires_in=expiration)
+        return jwt.dumps({'id': str(user[0].id)})
 
 
     def post(self):
         params = self.reqparse.parse_args()
         user = User.objects(username=params['username'])
-        if len(user) == 0:
+        if len(user) == 0 or len(user) > 1:
             return make_response(jsonify({'error': 'User not found'}), 404)
-        if self.verify_password(user[0].password, params['password']) != True:
+        elif self.verify_password(user[0].password, params['password']) != True:
             return make_response(jsonify({'error': 'Incorrect password'}), 403)
-        token = self.generate_auth_token(user)
-        return make_response(jsonify({'data': token}), 201)
+        return make_response(jsonify({'data': self.generate_auth_token(user)}), 201)

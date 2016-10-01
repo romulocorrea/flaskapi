@@ -3,13 +3,13 @@
 
 
 from flask import Flask, jsonify, make_response
-from flask_mongoengine import MongoEngine
-from app.config import settings, secret, db
+from app.config import config, db, initBcrypt
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = secret
-app.config['MONGODB_SETTINGS'] = settings
+app.config['SECRET_KEY'] = config['secret']
+app.config['MONGODB_SETTINGS'] = config['dbSettings']
+initBcrypt(app)
 db.init_app(app)
 
 

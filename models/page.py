@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #!flask/bin/python
 
+
 from app.config import db
 
 

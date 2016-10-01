@@ -8,6 +8,25 @@ from models.user import User
 from resources.auth import auth, bcrypt
 
 
+class UserCreateAPI(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('name', type=str, required=True, help='You must provide your name', location='json')
+        self.reqparse.add_argument('username', type=str, required=True, help='You must provide a valid username', location='json')
+        self.reqparse.add_argument('password', type=str, required=True, help='You must provide a valid password', location='json')
+        super(UserCreateAPI, self).__init__()
+
+
+    def hash_password(self, password):
+        return bcrypt.generate_password_hash(password)
+
+
+    def post(self):
+        params = self.reqparse.parse_args()
+        User(name=params['name'], username=params['username'], password=self.hash_password(params['password'])).save()
+        return make_response(jsonify({'data': 'User created'}), 201)
+
+
 class UserListAPI(Resource):
     decorators = [auth.login_required]
 
@@ -20,26 +39,9 @@ class UserListAPI(Resource):
         super(UserListAPI, self).__init__()
 
 
-    def hash_password(self, password):
-        return bcrypt.generate_password_hash(password)
-
-
     def get(self):
         users = User.objects.all()
         return make_response(jsonify({'data': users}), 201)
-
-
-    def post(self):
-        params = self.reqparse.parse_args()
-        if not params['username'] or len(params['username']) < 5:
-            return make_response(jsonify({'error': 'You must provide an username with at least 5 characters long'}), 400)
-        elif not params['password'] or len(params['password']) < 5:
-            return make_response(jsonify({'error': 'Your password must be at least 5 characters long'}), 400)
-        elif len(User.objects(username=params['username'])) > 0:
-            return make_response(jsonify({'error': 'This username has already been registered'}), 400)
-        else:
-            User(username=params['username'], password=self.hash_password(params['password'])).save()
-            return make_response(jsonify({'data': 'User created'}), 201)
 
 
 class UserAPI(Resource):
@@ -50,5 +52,4 @@ class UserAPI(Resource):
         user = User.objects(id=id)
         if not user or len(user) == 0:
             return make_response(jsonify({'error': 'User not found'}), 404)
-        print user
         return make_response(jsonify({'data': user}), 201)

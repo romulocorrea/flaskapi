@@ -15,11 +15,11 @@ Note it was used an EC2 instance in AWS to create a MongoDB server once mLab see
 
 ### REST endpoints:
 ##### Unsecured routes:
-  - `/api/v1/users/new`
+  - `/api/v1/register`
     - `POST` - create a new user
 
 
-  - `/api/v1/auth`
+  - `/api/v1/login`
     - `POST` - login which returns a token
 
 ##### Secured routes:
