@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 #!flask/bin/python
 
+
 from flask import abort, jsonify, make_response
 from flask_restful import Resource, reqparse
 from flask_httpauth import HTTPTokenAuth
 from itsdangerous import (TimedJSONWebSignatureSerializer as JWT, BadSignature, SignatureExpired)
+from bson.objectid import ObjectId
 from models.user import User
 from app.config import config
 auth = HTTPTokenAuth(scheme=config['authSchema'])
@@ -16,6 +18,7 @@ def verify_token(token):
     jwt = JWT(config['secret'])
     try:
         data = jwt.loads(token)
+        auth.user = data
     except SignatureExpired:
         abort(403)
     except BadSignature:
@@ -26,6 +29,29 @@ def verify_token(token):
 @auth.error_handler
 def unauthorized():
     return make_response(jsonify({'error': 'Unauthorized access'}), 403)
+
+
+def isAdmin():
+    return hasattr(auth, 'user') and auth.user['profile'] == 'ADMIN'
+
+
+def isSameUser(id):
+    return hasattr(auth, 'user') and auth.user['id'] == id
+
+
+def isValidId(id):
+    return ObjectId.is_valid(id)
+
+
+def isAuthorized(id):
+    return isAdmin() or isSameUser(id)
+
+
+auth.isAdmin = isAdmin
+auth.isSameUser = isSameUser
+auth.isValidId = isValidId
+auth.isAuthorized = isAuthorized
+auth.unauthorized = unauthorized
 
 
 class AuthAPI(Resource):
@@ -42,7 +68,10 @@ class AuthAPI(Resource):
 
     def generate_auth_token(self, user, expiration=3600):
         jwt = JWT(config['secret'], expires_in=expiration)
-        return jwt.dumps({'id': str(user[0].id)})
+        return jwt.dumps({
+            'id': str(user[0].id),
+            'profile': str(user[0].profile)
+        })
 
 
     def post(self):

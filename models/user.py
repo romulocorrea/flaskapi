@@ -9,3 +9,4 @@ class User(db.Document):
     name = db.StringField(required=True, max_length=50)
     username = db.StringField(required=True, unique=True, max_length=15)
     password = db.StringField(required=True)
+    profile = db.StringField(default='USER')
