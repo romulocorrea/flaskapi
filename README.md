@@ -13,6 +13,10 @@ Note it was used an EC2 instance in AWS to create a MongoDB server once mLab see
     - MongoDB
     - Flask
 
+### Live REST endpoints
+
+All REST endpoints described bellow are available on Heroku through: https://dev-web-flask.herokuapp.com/
+
 ### REST endpoints:
 ##### Unsecured routes:
   - `/api/v1/register`
