@@ -7,4 +7,4 @@ from app.config import db
 
 class Category(db.Document):
     title = db.StringField(required=True, unique=True, max_length=30)
-    userId = db.StringField(required=True)
+    userId = db.ObjectIdField(required=True)

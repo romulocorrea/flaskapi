@@ -31,6 +31,10 @@ def unauthorized():
     return make_response(jsonify({'error': 'Unauthorized access'}), 403)
 
 
+def hash_password(password):
+    return bcrypt.generate_password_hash(password)
+
+
 def isAdmin():
     return hasattr(auth, 'user') and auth.user['profile'] == 'ADMIN'
 
@@ -47,6 +51,7 @@ def isAuthorized(id):
     return isAdmin() or isSameUser(id)
 
 
+auth.hash_password = hash_password
 auth.isAdmin = isAdmin
 auth.isSameUser = isSameUser
 auth.isValidId = isValidId
