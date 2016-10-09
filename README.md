@@ -24,12 +24,12 @@ All REST endpoints described bellow are available on Heroku through: https://dev
 
 
   - `/api/v1/login`
-    - `POST` - login, which returns an JWT token
+    - `POST` - login, which returns a JWT (authorization token)
 
 
 ##### Secured routes:
-  - `/api/v1/users` (admin only / own user)
-    - `GET` - returns a list of users if user is admin, otherwise, only user's own information
+  - `/api/v1/users` (admin / own user)
+    - `GET` - returns a list of all users if user is admin, otherwise, only user's own information
 
 
   - `/api/v1/users/<id>` (admin / own user)
