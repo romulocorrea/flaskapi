@@ -20,11 +20,12 @@ Note it was used an EC2 instance in AWS to create a MongoDB server once mLab see
 
 
   - `/api/v1/login`
-    - `POST` - login which returns a token
+    - `POST` - login, which returns an JWT token
+
 
 ##### Secured routes:
-  - `/api/v1/users` (admin only)
-    - `GET` - returns a list of users
+  - `/api/v1/users` (admin only / own user)
+    - `GET` - returns a list of users if user is admin, otherwise, only user's own information
 
 
   - `/api/v1/users/<id>` (admin / own user)
@@ -34,7 +35,8 @@ Note it was used an EC2 instance in AWS to create a MongoDB server once mLab see
 
 
   - `/api/v1/pages` (admin / own user's pages)
-    - `GET` - returns a list of pages
+    - `GET` - returns a list of all pages if user is admin, otherwise, returns user's own pages
+    - `POST` - create a new page
 
 
   - `/api/v1/pages/<id>` (admin / own user's pages)
@@ -44,7 +46,8 @@ Note it was used an EC2 instance in AWS to create a MongoDB server once mLab see
 
 
   - `/api/v1/categories` (admin / own user's categories)
-    - `GET` - returns a list of categories
+    - `GET` - returns a list of all categories if user is admin, otherwise, returns user's own categories
+    - `POST` - create a new category
 
 
   - `/api/v1/categories/<id>` (admin / own user's categories)
