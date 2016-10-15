@@ -32,7 +32,7 @@ All REST endpoints described bellow are available on Heroku through: https://dev
     - `GET` - returns a list of all users if user is admin, otherwise, only user's own information
 
 
-  - `/api/v1/users/<id>` (admin / own user)
+  - `/api/v1/user/<id>` (admin / own user)
     - `GET` - returns details about a specific user
     - `PUT` - update a specific user
     - `DELETE` - delete a specific user
@@ -43,7 +43,7 @@ All REST endpoints described bellow are available on Heroku through: https://dev
     - `POST` - create a new page
 
 
-  - `/api/v1/pages/<id>` (admin / own user's pages)
+  - `/api/v1/page/<id>` (admin / own user's pages)
     - `GET` - returns details about a specific page
     - `PUT` - update a specific user
     - `DELETE` - delete a specific user
@@ -54,10 +54,10 @@ All REST endpoints described bellow are available on Heroku through: https://dev
     - `POST` - create a new category
 
 
-  - `/api/v1/categories/<id>` (admin / own user's categories)
+  - `/api/v1/category/<id>` (admin / own user's categories)
     - `GET` - returns details about a specific category
     - `PUT` - update a specific category
     - `DELETE` - delete a specific category
 
-  - `/api/v1/categories/<id>/pages` (admin / own user's categories)
+  - `/api/v1/category/<id>/pages` (admin / own user's categories)
     - `GET` - returns all pages related to a specific category
