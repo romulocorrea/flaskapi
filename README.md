@@ -58,3 +58,6 @@ All REST endpoints described bellow are available on Heroku through: https://dev
     - `GET` - returns details about a specific category
     - `PUT` - update a specific category
     - `DELETE` - delete a specific category
+
+  - `/api/v1/categories/<id>/pages` (admin / own user's categories)
+    - `GET` - returns all pages related to a specific category
