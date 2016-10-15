@@ -6,7 +6,6 @@ from flask import abort, jsonify, make_response
 from flask_restful import Resource, reqparse
 from flask_httpauth import HTTPTokenAuth
 from itsdangerous import (TimedJSONWebSignatureSerializer as JWT, BadSignature, SignatureExpired)
-from bson.objectid import ObjectId
 from models.user import User
 from app.config import config
 auth = HTTPTokenAuth(scheme=config['authSchema'])
@@ -39,22 +38,17 @@ def isAdmin():
     return hasattr(auth, 'user') and auth.user['profile'] == 'ADMIN'
 
 
-def isSameUser(id):
-    return hasattr(auth, 'user') and auth.user['id'] == id
+def isSameUser(userId):
+    return hasattr(auth, 'user') and str(auth.user['id']) == str(userId)
 
 
-def isValidId(id):
-    return ObjectId.is_valid(id)
-
-
-def isAuthorized(id):
-    return isAdmin() or isSameUser(id)
+def isAuthorized(userId):
+    return isAdmin() or isSameUser(userId)
 
 
 auth.hash_password = hash_password
 auth.isAdmin = isAdmin
 auth.isSameUser = isSameUser
-auth.isValidId = isValidId
 auth.isAuthorized = isAuthorized
 auth.unauthorized = unauthorized
 

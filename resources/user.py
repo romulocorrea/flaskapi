@@ -50,7 +50,7 @@ class UserAPI(Resource):
 
 
     def get(self, id):
-        if auth.isValidId(id) and auth.isAuthorized(id):
+        if Commons.isValidId(id) and auth.isAuthorized(id):
             user = User.objects(id=id)
             return Commons.notFound('user') if Commons.checkIfNotExists(user) else make_response(jsonify({'data': user}), 201)
         return auth.unauthorized()
@@ -58,7 +58,7 @@ class UserAPI(Resource):
 
     def put(self, id):
         params = self.reqparse.parse_args()
-        if auth.isValidId(id) and auth.isAuthorized(id):
+        if Commons.isValidId(id) and auth.isAuthorized(id):
             if Commons.checkIfNotExists(User.objects(id=id)):
                 return Commons.notFound('user')
             data = commons.filterQueryParams(params)
@@ -70,7 +70,7 @@ class UserAPI(Resource):
 
 
     def delete(self, id):
-        if auth.isValidId(id) and auth.isAuthorized(id):
+        if Commons.isValidId(id) and auth.isAuthorized(id):
             user = User.objects(id=id)
             if Commons.checkIfNotExists(user):
                 return Commons.notFound('user')

@@ -5,6 +5,7 @@
 from flask import jsonify, make_response
 from flask_restful import Resource, reqparse
 from models.category import Category
+from models.page import Page
 from resources.auth import auth
 from resources.commons import Commons
 
@@ -37,29 +38,54 @@ class CategoryAPI(Resource):
     decorators = [auth.login_required]
 
 
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('title', type=str, required=True, help='You must provide a title', location='json')
+        super(CategoryAPI, self).__init__()
+
+
     def get(self, id):
-        if auth.isValidId(id) and auth.isAuthorized(id):
+        if Commons.isValidId(id):
             category = Category.objects(id=id)
-            return Commons.notFound('category') if Commons.checkIfNotExists(category) else make_response(jsonify({'data': category}), 201)
+            if Commons.checkIfNotExists(category):
+                return Commons.notFound('category')
+            if auth.isAuthorized(category[0].userId):
+                return make_response(jsonify({'data': category}), 201)
         return auth.unauthorized()
 
 
     def put(self, id):
-        params = self.reqparse.parse_args()
-        if auth.isValidId(id) and auth.isAuthorized(id):
-            if Commons.checkIfNotExists(Category.objects(id=id)):
+        if Commons.isValidId(id):
+            category = Category.objects(id=id)
+            if Commons.checkIfNotExists(category):
                 return Commons.notFound('category')
-            data = commons.filterQueryParams(params)
-            Category.objects(id=id).update_one(upsert=False, write_concern=None, **data)
-            return make_response(jsonify({'data': 'Category updated'}), 201)
+            if auth.isAuthorized(category[0].userId):
+                params = Commons.filterQueryParams(self.reqparse.parse_args())
+                Category.objects(id=id).update_one(upsert=False, write_concern=None, **params)
+                return make_response(jsonify({'data': 'Category updated'}), 201)
         return auth.unauthorized()
 
 
     def delete(self, id):
-        if auth.isValidId(id) and auth.isAuthorized(id):
+        if Commons.isValidId(id):
             category = Category.objects(id=id)
             if Commons.checkIfNotExists(category):
                 return Commons.notFound('category')
-            category.delete()
-            return make_response(jsonify({'data': 'Category was deleted'}), 201)
+            if auth.isAuthorized(category[0].userId):
+                category.delete()
+                return make_response(jsonify({'data': 'Category was deleted'}), 201)
+        return auth.unauthorized()
+
+
+class CategoryPagesAPI(Resource):
+    decorators = [auth.login_required]
+
+
+    def get(self, id):
+        if Commons.isValidId(id):
+            pages = Page.objects(categoryId=id)
+            if Commons.checkIfNotExists(pages):
+                return Commons.notFound('page')
+            if auth.isAuthorized(pages[0].userId):
+                return make_response(jsonify({'data': pages}), 201)
         return auth.unauthorized()

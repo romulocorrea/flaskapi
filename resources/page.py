@@ -28,25 +28,35 @@ class PageListAPI(Resource):
 
     def post(self):
         params = self.reqparse.parse_args()
-        Page(
-            title=params['title'],
-            url=params['url'],
-            categoryId=params['categoryId'],
-            userId=auth.user['id']
-        ).save()
-        return make_response(jsonify({'data': 'Page created'}), 201)
+        if Commons.isValidId(params['categoryId']):
+            Page(
+                title=params['title'],
+                url=params['url'],
+                categoryId=params['categoryId'],
+                userId=auth.user['id']
+            ).save()
+            return make_response(jsonify({'data': 'Page created'}), 201)
+        return make_response(jsonify({'error': 'Invalid categoryId'}), 500)
 
 
 class PageAPI(Resource):
     decorators = [auth.login_required]
 
 
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('title', type=str, location='json')
+        self.reqparse.add_argument('url', type=str, location='json')
+        self.reqparse.add_argument('categoryId', type=str, location='json')
+        super(PageAPI, self).__init__()
+
+
     def get(self, id):
-        if auth.isValidId(id) and auth.isAuthorized(id):
+        if Commons.isValidId(id):
             page = Page.objects(id=id)
             if Commons.checkIfNotExists(page):
                 return Commons.notFound('page')
-            else:
+            if auth.isAuthorized(page[0].userId):
                 Page.objects(id=id).update(views=page[0].views + 1)
                 return make_response(jsonify({'data': page}), 201)
         return auth.unauthorized()
@@ -54,20 +64,23 @@ class PageAPI(Resource):
 
     def put(self, id):
         params = self.reqparse.parse_args()
-        if auth.isValidId(id) and auth.isAuthorized(id):
-            if Commons.checkIfNotExists(Page.objects(id=id)):
+        if Commons.isValidId(id):
+            page = Page.objects(id=id)
+            if Commons.checkIfNotExists(page):
                 return Commons.notFound('page')
-            data = commons.filterQueryParams(params)
-            Page.objects(id=id).update_one(upsert=False, write_concern=None, **data)
-            return make_response(jsonify({'data': 'Page updated'}), 201)
+            if auth.isAuthorized(page[0].userId):
+                data = Commons.filterQueryParams(params)
+                Page.objects(id=id).update_one(upsert=False, write_concern=None, **data)
+                return make_response(jsonify({'data': 'Page updated'}), 201)
         return auth.unauthorized()
 
 
     def delete(self, id):
-        if auth.isValidId(id) and auth.isAuthorized(id):
+        if Commons.isValidId(id):
             page = Page.objects(id=id)
             if Commons.checkIfNotExists(page):
                 return Commons.notFound('page')
-            page.delete()
-            return make_response(jsonify({'data': 'Page was deleted'}), 201)
+            if auth.isAuthorized(page[0].userId):
+                page.delete()
+                return make_response(jsonify({'data': 'Page was deleted'}), 201)
         return auth.unauthorized()
