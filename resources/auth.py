@@ -61,10 +61,12 @@ class AuthAPI(Resource):
         super(AuthAPI, self).__init__()
 
 
+    @classmethod
     def verify_password(self, hash, password):
         return bcrypt.check_password_hash(hash, password)
 
 
+    @classmethod
     def generate_auth_token(self, user, expiration=3600):
         jwt = JWT(config['secret'], expires_in=expiration)
         return jwt.dumps({
