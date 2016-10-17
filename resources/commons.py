@@ -27,5 +27,5 @@ class Commons(object):
 
 
     @classmethod
-    def isValidId(self, id):
-        return ObjectId.is_valid(id)
+    def isValidId(self, data):
+        return ObjectId.is_valid(data)
