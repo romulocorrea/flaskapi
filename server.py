@@ -3,10 +3,12 @@
 
 
 from flask import Flask, jsonify, make_response
+from flask_cors import CORS, cross_origin
 from app.config import config, db, initBcrypt
 
 
 app = Flask(__name__)
+CORS(app)
 app.config['SECRET_KEY'] = config['secret']
 app.config['MONGODB_SETTINGS'] = config['dbSettings']
 initBcrypt(app)
