@@ -71,7 +71,9 @@ class AuthAPI(Resource):
         jwt = JWT(config['secret'], expires_in=expiration)
         return jwt.dumps({
             'id': str(user[0].id),
-            'profile': str(user[0].profile)
+            'profile': str(user[0].profile),
+            'name': str(user[0].name),
+            'username': str(user[0].username)
         })
 
 
