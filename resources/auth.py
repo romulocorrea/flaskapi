@@ -81,7 +81,7 @@ class AuthAPI(Resource):
         params = self.reqparse.parse_args()
         user = User.objects(username=params['username'])
         if len(user) == 0 or len(user) > 1:
-            return make_response(jsonify({'error': 'User not found'}), 404)
+            return make_response(jsonify({'error': 'User not found'}), 400)
         elif self.verify_password(user[0].password, params['password']) != True:
             return make_response(jsonify({'error': 'Incorrect password'}), 403)
-        return make_response(jsonify({'data': self.generate_auth_token(user)}), 201)
+        return make_response(jsonify({'data': self.generate_auth_token(user)}), 200)
