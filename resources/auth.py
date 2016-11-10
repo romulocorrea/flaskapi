@@ -27,7 +27,7 @@ def verify_token(token):
 
 @auth.error_handler
 def unauthorized():
-    return make_response(jsonify({'error': 'Unauthorized access'}), 403)
+    return make_response(jsonify({'error': '403'}), 403)
 
 
 def hash_password(password):
@@ -81,7 +81,7 @@ class AuthAPI(Resource):
         params = self.reqparse.parse_args()
         user = User.objects(username=params['username'])
         if len(user) == 0 or len(user) > 1:
-            return make_response(jsonify({'error': 'User not found'}), 400)
+            return make_response(jsonify({'error': '404_USER'}), 404)
         elif self.verify_password(user[0].password, params['password']) != True:
-            return make_response(jsonify({'error': 'Incorrect password'}), 403)
+            return make_response(jsonify({'error': '403_PASSWORD'}), 403)
         return make_response(jsonify({'data': self.generate_auth_token(user)}), 200)
