@@ -14,6 +14,7 @@ bcrypt = config['bcrypt']
 
 @auth.verify_token
 def verify_token(token):
+    '''This method is responsible for handling and validating tokens'''
     jwt = JWT(config['secret'])
     try:
         data = jwt.loads(token)
@@ -27,22 +28,27 @@ def verify_token(token):
 
 @auth.error_handler
 def unauthorized():
+    '''This method is responsible for creating 403 unauthorized errors'''
     return make_response(jsonify({'error': '403'}), 403)
 
 
 def hash_password(password):
+    '''This method is responsible for hashing the passwords'''
     return bcrypt.generate_password_hash(password)
 
 
 def isAdmin():
+    '''This method is responsible for verifying if an user is ADMIN'''
     return hasattr(auth, 'user') and auth.user['profile'] == 'ADMIN'
 
 
 def isSameUser(userId):
+    '''This method is responsible for verifying if the user requesting some action is the same user logged in'''
     return hasattr(auth, 'user') and str(auth.user['id']) == str(userId)
 
 
 def isAuthorized(userId):
+    '''This method is responsible for verifying if the user has access for some feature'''
     return isAdmin() or isSameUser(userId)
 
 
@@ -54,6 +60,7 @@ auth.unauthorized = unauthorized
 
 
 class AuthAPI(Resource):
+    '''This class is responsible for handling POST requests to logging in an user'''
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('username', type=str, required=True, help='Username is required', location='json')
@@ -63,11 +70,13 @@ class AuthAPI(Resource):
 
     @classmethod
     def verify_password(self, hash, password):
+        '''This method is responsible for validating the password'''
         return bcrypt.check_password_hash(hash, password)
 
 
     @classmethod
     def generate_auth_token(self, user, expiration=3600):
+        '''This method is responsible for generating an auth token'''
         jwt = JWT(config['secret'], expires_in=expiration)
         return jwt.dumps({
             'id': str(user[0].id),
@@ -78,6 +87,7 @@ class AuthAPI(Resource):
 
 
     def post(self):
+        '''This method is responsible for handling POST requests from loggin forms'''
         params = self.reqparse.parse_args()
         user = User.objects(username=params['username'])
         if len(user) == 0 or len(user) > 1:

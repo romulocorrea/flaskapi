@@ -10,6 +10,8 @@ from resources.commons import Commons
 
 
 class UserCreateAPI(Resource):
+    '''This class is responsible for handling POST requests for creating an user'''
+
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('name', type=str, required=True, help='You must provide your name', location='json')
@@ -19,6 +21,7 @@ class UserCreateAPI(Resource):
 
 
     def post(self):
+        '''This method receives by params in the request`s headers the user`s data and saves it to the database'''
         params = self.reqparse.parse_args()
         User(
             name=params['name'],
@@ -29,6 +32,7 @@ class UserCreateAPI(Resource):
 
 
 class UserListAPI(Resource):
+    '''This class is responsible for handling GET requests for a list of users'''
     decorators = [auth.login_required]
 
 
@@ -38,6 +42,7 @@ class UserListAPI(Resource):
 
 
 class UserAPI(Resource):
+    '''This class is responsible for handling GET, PUT and DELETE requests for a single user'''
     decorators = [auth.login_required]
 
 
@@ -50,6 +55,7 @@ class UserAPI(Resource):
 
 
     def get(self, id):
+        '''This method receives an ID from an user and returns the user'''
         if Commons.isValidId(id) and auth.isAuthorized(id):
             user = User.objects(id=id)
             return Commons.notFound('user') if Commons.checkIfNotExists(user) else make_response(jsonify({'data': user}), 201)
@@ -57,6 +63,7 @@ class UserAPI(Resource):
 
 
     def put(self, id):
+        '''This method receives an ID from an user and updates the user'''
         params = self.reqparse.parse_args()
         if Commons.isValidId(id) and auth.isAuthorized(id):
             if Commons.checkIfNotExists(User.objects(id=id)):
@@ -70,6 +77,7 @@ class UserAPI(Resource):
 
 
     def delete(self, id):
+        '''This method receives an ID from an user and deletes the user'''
         if Commons.isValidId(id) and auth.isAuthorized(id):
             user = User.objects(id=id)
             if Commons.checkIfNotExists(user):

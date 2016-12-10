@@ -11,6 +11,7 @@ from resources.commons import Commons
 
 
 class CategoryListAPI(Resource):
+    '''This class is responsible for handling GET and POST requests from categories'''
     decorators = [auth.login_required]
 
 
@@ -21,11 +22,13 @@ class CategoryListAPI(Resource):
 
 
     def get(self):
+        '''This method returns all categories from an user'''
         categories = Category.objects.all() if auth.isAdmin() else Category.objects(userId=auth.user['id'])
         return Commons.notFound('category') if Commons.checkIfNotExists(categories) else make_response(jsonify({'data': categories}), 201)
 
 
     def post(self):
+        '''This method creates a new category related to an user'''
         params = self.reqparse.parse_args()
         Category(
             title=params['title'],
@@ -35,6 +38,7 @@ class CategoryListAPI(Resource):
 
 
 class CategoryAPI(Resource):
+    '''This class is responsible for handling GET, PUT and DELETE requests for a single category'''
     decorators = [auth.login_required]
 
 
@@ -45,6 +49,7 @@ class CategoryAPI(Resource):
 
 
     def get(self, id):
+        '''This method receives an ID from an category and returns the category'''
         if Commons.isValidId(id):
             category = Category.objects(id=id)
             if Commons.checkIfNotExists(category):
@@ -55,6 +60,7 @@ class CategoryAPI(Resource):
 
 
     def put(self, id):
+        '''This method receives an ID from an category and updates the category'''
         if Commons.isValidId(id):
             category = Category.objects(id=id)
             if Commons.checkIfNotExists(category):
@@ -67,6 +73,7 @@ class CategoryAPI(Resource):
 
 
     def delete(self, id):
+        '''This method receives an ID from an category and deletes the category'''
         if Commons.isValidId(id):
             category = Category.objects(id=id)
             if Commons.checkIfNotExists(category):
@@ -78,6 +85,7 @@ class CategoryAPI(Resource):
 
 
 class CategoryPagesAPI(Resource):
+    '''This class is responsible for handling GET requests for pages from a category'''
     decorators = [auth.login_required]
 
 

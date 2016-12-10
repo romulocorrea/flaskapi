@@ -10,6 +10,7 @@ from resources.commons import Commons
 
 
 class PageListAPI(Resource):
+    '''This class is responsible for handling GET and POST requests from pages'''
     decorators = [auth.login_required]
 
 
@@ -22,11 +23,13 @@ class PageListAPI(Resource):
 
 
     def get(self):
+        '''This method returns all pages from an user'''
         pages = Page.objects.all() if auth.isAdmin() else Page.objects(userId=auth.user['id'])
         return Commons.notFound('page') if Commons.checkIfNotExists(pages) else make_response(jsonify({'data': pages}), 201)
 
 
     def post(self):
+        '''This method creates a new page related to an user'''
         params = self.reqparse.parse_args()
         if Commons.isValidId(params['categoryId']):
             Page(
@@ -40,6 +43,7 @@ class PageListAPI(Resource):
 
 
 class PageAPI(Resource):
+    '''This class is responsible for handling GET, PUT and DELETE requests for a single page'''
     decorators = [auth.login_required]
 
 
@@ -52,6 +56,7 @@ class PageAPI(Resource):
 
 
     def get(self, id):
+        '''This method receives an ID from an page and returns the page'''
         if Commons.isValidId(id):
             page = Page.objects(id=id)
             if Commons.checkIfNotExists(page):
@@ -63,6 +68,7 @@ class PageAPI(Resource):
 
 
     def put(self, id):
+        '''This method receives an ID from an page and updates the page'''
         params = self.reqparse.parse_args()
         if Commons.isValidId(id):
             page = Page.objects(id=id)
@@ -76,6 +82,7 @@ class PageAPI(Resource):
 
 
     def delete(self, id):
+        '''This method receives an ID from an page and deletes the page'''
         if Commons.isValidId(id):
             page = Page.objects(id=id)
             if Commons.checkIfNotExists(page):
